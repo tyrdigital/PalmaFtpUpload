@@ -33,7 +33,7 @@ async function sendFileToFTP(fileBuffer, remotePath) {
 }
 
 // Rota POST para enviar o arquivo via FTP
-app.post("/upload", upload.single("file"), async (req, res) => {
+app.post("/UPLOAD", upload.single("file"), async (req, res) => {
     if (!req.file) {
         return res.status(400).send("Nenhum arquivo enviado.");
     }
