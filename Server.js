@@ -23,7 +23,8 @@ const ftpConfig = {
     secure: true,
     secureOptions: {
         rejectUnauthorized: false // Ignorar a verificação do certificado
-    }
+    },
+    timeout: 10000, // Define um tempo limite
 };
 
 //Definir diretório onde onde os arquivos serão salvos
@@ -36,7 +37,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname); //Obtém a extensão do arquivo
-        const filename = file.originalname; //Define o nome do arquivo com timestamp
+        const filename = file.originalname.replace(/\s+/g, '_').replace(/[ç]/g, 'c'); // Substitui espaços e caracteres especiais
         cb(null, filename); //Define o nome do arquivo
     }
 });
@@ -55,11 +56,13 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para rec
         await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
         fs.unlinkSync(req.file.path); // Após o upload, remove o arquivo temporário do servidor local
         res.status(200).json({ message: 'Arquivo enviado para o FTP com sucesso!', file: req.file }); // Responde ao cliente
-        client.close(); // Fecha a conexão FTP
     }
     catch (error) {
         console.error('Erro ao enviar para o FTP:', error);
         res.status(500).json({ error: 'Falha ao enviar o arquivo para o servidor FTP' });
+    }
+    finally{
+        client.close(); // Fecha a conexão FTP
     }
 });
 
