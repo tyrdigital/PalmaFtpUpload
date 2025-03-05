@@ -4,7 +4,8 @@ import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
 
-const SERVER_CONFIG = 'https://palmaftpupload.onrender.com';
+//const SERVER_CONFIG = 'https://palmaftpupload.onrender.com';
+const SERVER_CONFIG = 'http://192.168.0.100:3000';
 
 export default function App() {
   const [loading, setLoading] = useState(false);
@@ -72,7 +73,7 @@ export default function App() {
         type: 'application/octet-stream'
       });
       //Envia para o servidor
-      await axios.post(`${SERVER_CONFIG}/UPLOAD`,
+      const response = await axios.post(`${SERVER_CONFIG}/UPLOAD`,
         formData,
         {
           headers: {
@@ -80,6 +81,7 @@ export default function App() {
           },
         }
       );
+      console.log('Arquivo enviado com sucesso:', response.data);
     }
     catch (error) {
       Alert.alert("Erro!", error.message);

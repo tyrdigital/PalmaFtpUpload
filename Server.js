@@ -1,53 +1,70 @@
 const express = require('express');
+const cors = require('cors');
 const multer = require('multer');
-const ftp = require("basic-ftp");
+const path = require('path');
+const fs = require('fs');
+const ftp = require('basic-ftp'); // Importa diretamente o módulo FTP
+const { error } = require('console');
 const app = express();
-const port = process.env.PORT || 3000;
+app.use(cors()); //Permitir requisições de outras origens
+const port = 3000;
 
-// Configuração do multer para fazer upload de arquivos
-const storage = multer.memoryStorage(); // Armazenamento em memória (para facilitar o envio via FTP)
-const upload = multer({ storage: storage });
-
-// Função para enviar o arquivo via FTP
-async function sendFileToFTP(fileBuffer, remotePath) {
-    const client = new ftp.Client();
-    client.ftp.verbose = true; // Logs detalhados, útil para debug
-
-    try {
-        // Conectando ao servidor FTP
-        await client.access({
-            host: process.env.FTP_HOST, //Servidor FTP
-            user: process.env.FTP_USER, //Usuário
-            password: process.env.FTP_PASSWORD, //Senha, // Altere para sua senha
-            secure: process.env.FTP_PASSWORD, //Senha
-        });
-
-        // Enviar o arquivo em buffer para o servidor FTP
-        await client.uploadFrom(fileBuffer, remotePath);
-        console.log(`Arquivo enviado com sucesso para ${remotePath}`);
-    } catch (error) {
-        console.error("Erro ao enviar o arquivo:", error);
-    } finally {
-        client.close();
+//Informações do servidor FTP
+const ftpConfig = {
+    host: 'www.palmasistemas.com.br', //Servidor FTP
+    user: 'palmasistemas', //Usuário
+    password: 'gremio1983', //Senha
+    secure: true,
+    secureOptions: {
+        rejectUnauthorized: false // Ignorar a verificação do certificado
     }
-}
+};
 
-// Rota POST para enviar o arquivo via FTP
-app.post("/UPLOAD", upload.single("file"), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send("Nenhum arquivo enviado.");
-    }
+//Definir diretório onde onde os arquivos serão salvos
+const uploadDirectory = path.join(__dirname, 'Palma');
 
-    const fileBuffer = req.file.buffer; // Buffer do arquivo enviado
-    const remotePath = `caminho/no/servidor/${req.file.originalname}`; // Defina o caminho no servidor FTP
-
-    try {
-        await sendFileToFTP(fileBuffer, remotePath);
-        res.status(200).send("Arquivo enviado com sucesso.");
-    } catch (error) {
-        res.status(500).send("Erro ao enviar o arquivo para o servidor FTP.");
+//Configurar o multer para armazenar os arquivos na pasta
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDirectory); //Caminho do diretório
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname); //Obtém a extensão do arquivo
+        const filename = file.originalname; //Define o nome do arquivo com timestamp
+        cb(null, filename); //Define o nome do arquivo
     }
 });
+
+const upload = multer({ storage: storage });
+
+app.get('/DADOS', (req, res) => {
+    res.json({ message: "TesteDoLeonardo@@OS_14_" });
+});
+
+app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para receber arquivo
+    if (!req.file) {
+        return res.status(400).json({ error: "Nenhum Arquivo Enviado!" });
+    }
+    try {
+        const client = new ftp.Client(); //Cria o cliente FTP
+        client.ftp.verbose = true;
+        await client.access(ftpConfig); // Conecta-se ao servidor FTP
+        const remotePath = '/www/Palma/'; // Caminho da pasta de destino no servidor FTP
+        await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
+        fs.unlinkSync(req.file.path); // Após o upload, remove o arquivo temporário do servidor local
+        res.status(200).json({ message: 'Arquivo enviado para o FTP com sucesso!', file: req.file }); // Responde ao cliente
+        client.close(); // Fecha a conexão FTP
+    }
+    catch (error) {
+        console.error('Erro ao enviar para o FTP:', error);
+        res.status(500).json({ error: 'Falha ao enviar o arquivo para o servidor FTP' });
+    }
+});
+
+//Cria a pasta(Se não existir)
+if (!fs.existsSync(uploadDirectory)) {
+    fs.mkdirSync(uploadDirectory);
+}
 
 app.listen(port, () => {
     console.log("Servidor rodando!");
