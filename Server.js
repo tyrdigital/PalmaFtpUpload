@@ -13,15 +13,14 @@ const ftpConfig = {
     host: process.env.FTP_HOST, //Servidor FTP
     user: process.env.FTP_USER, //Usuário
     password: process.env.FTP_PASSWORD, //Senha
-    secure: 'implicit',
+    secure: false,
     secureOptions: {
-        rejectUnauthorized: false // Ignorar a verificação do certificado
-    },
-    timeout: 100000, // Define um tempo limite
+        rejectUnauthorized: true // Ignorar a verificação do certificado
+    }
 };
 
 //Definir diretório onde onde os arquivos serão salvos
-const uploadDirectory = path.join(__dirname, 'tmp'); // Usando diretório 'tmp'
+const uploadDirectory = '/tmp'; // Usando diretório 'tmp'
 
 //Configurar o multer para armazenar os arquivos na pasta
 const storage = multer.diskStorage({
