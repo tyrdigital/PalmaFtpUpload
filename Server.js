@@ -21,6 +21,9 @@ const ftpConfig = {
 
 //Definir diretório onde onde os arquivos serão salvos
 const uploadDirectory = '/tmp'; // Usando diretório 'tmp'
+if (!fs.existsSync(uploadDirectory)) {
+    fs.mkdirSync(uploadDirectory);
+}
 
 //Configurar o multer para armazenar os arquivos na pasta
 const storage = multer.diskStorage({
@@ -28,21 +31,19 @@ const storage = multer.diskStorage({
         cb(null, uploadDirectory); //Caminho do diretório
     },
     filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname); //Obtém a extensão do arquivo
         const filename = file.originalname.replace(/\s+/g, '_').replace(/[ç]/g, 'c'); // Substitui espaços e caracteres especiais
         cb(null, filename); //Define o nome do arquivo
     }
 });
-
 const upload = multer({ storage: storage });
-
-app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para Enviar arquivo
+//Rota para Enviar arquivo
+app.post('/UPLOAD', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: "Nenhum Arquivo Enviado!" });
     }
+    const client = new ftp.Client(); //Cria o cliente FTP
+    client.ftp.verbose = true;
     try {
-        const client = new ftp.Client(); //Cria o cliente FTP
-        client.ftp.verbose = true;
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
         const remotePath = 'www/Palma/'; // Caminho da pasta de destino no servidor FTP
         await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
@@ -53,15 +54,10 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para Env
         console.error('Erro ao enviar para o FTP:', error);
         res.status(500).json({ error: 'Falha ao enviar o arquivo para o servidor FTP' });
     }
-    finally{
+    finally {
         client.close(); // Fecha a conexão FTP
     }
 });
-
-//Cria a pasta(Se não existir)
-if (!fs.existsSync(uploadDirectory)) {
-    fs.mkdirSync(uploadDirectory);
-}
 
 app.listen(port, () => {
     console.log("Servidor rodando!");
