@@ -4,31 +4,24 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const ftp = require('basic-ftp'); // Importa diretamente o módulo FTP
-const { error } = require('console');
 const app = express();
 app.use(cors()); //Permitir requisições de outras origens
-const port = 3000;
-
-const SERVER = {
-    host: 'www.palmasistemas.com.br', //Servidor FTP
-    user: 'palmasistemas', //Usuário
-    password: 'gremio1983', //Senha     
-}
+const port = process.env.PORT || 3000;
 
 //Informações do servidor FTP
 const ftpConfig = {
-    host: SERVER.host, //Servidor FTP
-    user: SERVER.user, //Usuário
-    password: SERVER.password, //Senha
+    host: process.env.FTP_HOST, //Servidor FTP
+    user: process.env.FTP_USER, //Usuário
+    password: process.env.FTP_PASSWORD, //Senha
     secure: true,
     secureOptions: {
         rejectUnauthorized: false // Ignorar a verificação do certificado
     },
-    timeout: 10000, // Define um tempo limite
+    timeout: 100000, // Define um tempo limite
 };
 
 //Definir diretório onde onde os arquivos serão salvos
-const uploadDirectory = path.join(__dirname, 'Palma');
+const uploadDirectory = path.join(__dirname, 'tmp'); // Usando diretório 'tmp'
 
 //Configurar o multer para armazenar os arquivos na pasta
 const storage = multer.diskStorage({
@@ -44,7 +37,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para receber arquivo
+app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para Enviar arquivo
     if (!req.file) {
         return res.status(400).json({ error: "Nenhum Arquivo Enviado!" });
     }
@@ -52,7 +45,7 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para rec
         const client = new ftp.Client(); //Cria o cliente FTP
         client.ftp.verbose = true;
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
-        const remotePath = '/www/Palma/'; // Caminho da pasta de destino no servidor FTP
+        const remotePath = '/Palma/'; // Caminho da pasta de destino no servidor FTP
         await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
         fs.unlinkSync(req.file.path); // Após o upload, remove o arquivo temporário do servidor local
         res.status(200).json({ message: 'Arquivo enviado para o FTP com sucesso!', file: req.file }); // Responde ao cliente
