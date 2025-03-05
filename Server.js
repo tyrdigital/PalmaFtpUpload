@@ -13,7 +13,7 @@ const ftpConfig = {
     host: process.env.FTP_HOST, //Servidor FTP
     user: process.env.FTP_USER, //Usuário
     password: process.env.FTP_PASSWORD, //Senha
-    secure: true,
+    secure: 'implicit',
     secureOptions: {
         rejectUnauthorized: false // Ignorar a verificação do certificado
     },
@@ -45,7 +45,7 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para Env
         const client = new ftp.Client(); //Cria o cliente FTP
         client.ftp.verbose = true;
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
-        const remotePath = '/Palma/'; // Caminho da pasta de destino no servidor FTP
+        const remotePath = 'www/Palma/'; // Caminho da pasta de destino no servidor FTP
         await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
         fs.unlinkSync(req.file.path); // Após o upload, remove o arquivo temporário do servidor local
         res.status(200).json({ message: 'Arquivo enviado para o FTP com sucesso!', file: req.file }); // Responde ao cliente
