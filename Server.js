@@ -14,6 +14,7 @@ const ftpConfig = {
     host: process.env.FTP_HOST, //Servidor FTP
     user: process.env.FTP_USER, //Usuário
     password: process.env.FTP_PASSWORD, //Senha
+    port: 21,
     secure: true,
     secureOptions: {
         rejectUnauthorized: true
