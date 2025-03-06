@@ -14,7 +14,7 @@ const ftpConfig = {
     port: 21,
     user: 'palmasistemas',
     password: 'gremio1983',
-    secure: false
+    secure: true
 };
 
 //Definir diretório onde onde os arquivos serão salvos
