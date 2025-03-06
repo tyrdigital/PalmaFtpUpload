@@ -42,8 +42,10 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para rec
     client.ftp.verbose = true;
     try {
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
+        console.log("Conexão com FTP bem-sucedida!");
         const remotePath = '/www/Palma/'; // Caminho da pasta de destino no servidor FTP
         await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
+        console.log(`Arquivo ${req.file.filename} enviado para o FTP`);
         fs.unlinkSync(req.file.path); // Após o upload, remove o arquivo temporário do servidor local
         res.status(200).json({ message: 'Arquivo enviado para o FTP com sucesso!', file: req.file }); // Responde ao cliente
     }
