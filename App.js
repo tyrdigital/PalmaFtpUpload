@@ -64,30 +64,29 @@ export default function App() {
 
   const UploadFile = async (file) => {
     try {
-      const ftpServer = 'example.com';  // URL do servidor FTP
-      const username = 'your-ftp-username';  // Nome de usuário FTP
-      const password = 'your-ftp-password';  // Senha FTP
-      const remoteDir = '/remote/upload/dir';  // Diretório no servidor FTP
-
-      const client = new FTPClient();
-      await client.access({
-        host: ftpServer,
-        user: username,
-        password: password,
-        secure: false,  // Use 'true' se o FTP suportar TLS
+      const formData = new FormData();
+      formData.append("file", {
+        uri: file.uri,
+        type: file.mimeType, // O tipo de MIME pode ser necessário
+        name: text.content + file.name,
       });
 
-      const remotePath = `${remoteDir}/${text.content}${file.name.split('/').pop()}`;
+      const response = await fetch(`${SERVER_CONFIG}/upload`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-      // Envia o arquivo para o servidor FTP
-      await client.uploadFrom(file.uri, remotePath);
+      if (!response.ok) {
+        throw new Error("Erro ao enviar arquivo: " + response.statusText);
+      }
 
-      console.log('Arquivo enviado com sucesso:', remotePath);
-      client.close();
-    }
-    catch (error) {
-      console.error("Erro no Upload via FTP:", error);
-      Alert.alert("Erro!", error.message);
+      return await response.json(); // Pode ser necessário ajustar conforme o servidor retorna
+    } catch (error) {
+      console.error("Erro ao enviar arquivo:", error);
+      throw error; // Rethrow the error to be caught in the `catch` block of HandleOk
     }
   };
 
