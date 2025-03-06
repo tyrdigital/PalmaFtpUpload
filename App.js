@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, BackHandler
 import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
 
-const SERVER_CONFIG = 'http://10.195.96.38:3000'; // Dados do servidor(IP: 10.195.96.38)
-//const SERVER_CONFIG = 'https://palmaftpupload.onrender.com';
+//const SERVER_CONFIG = 'http://10.195.96.38:3000'; // Dados do servidor(IP: 10.195.96.38)
+const SERVER_CONFIG = 'https://palmaftpupload.onrender.com';
 
 export default function App() {
   const [loading, setLoading] = useState(false);
