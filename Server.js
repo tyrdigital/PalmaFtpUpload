@@ -7,13 +7,13 @@ const ftp = require('basic-ftp'); // Importa diretamente o módulo FTP
 const { error } = require('console');
 const app = express();
 app.use(cors()); //Permitir requisições de outras origens
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 //Informações do servidor FTP
 const ftpConfig = {
-    host: 'www.palmasistemas.com.br',
-    user: 'palmasistemas',
-    password: 'gremio1983',
+    host: process.env.FTP_HOST,
+    user: process.env.FTP_USER,
+    password: process.env.FTP_PASSWORD,
     secure: true,
     secureOptions: {
         rejectUnauthorized: false
@@ -63,5 +63,5 @@ if (!fs.existsSync(uploadDirectory)) {
 }
 
 app.listen(port, () => {
-    console.log("Servidor rodando!");
+    console.log(`Servidor rodando na porta ${port}`);
 });
