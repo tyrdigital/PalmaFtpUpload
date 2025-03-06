@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 //Informações do servidor FTP
 const ftpConfig = {
     host: process.env.FTP_HOST,
+    port: 21,
     user: process.env.FTP_USER,
     password: process.env.FTP_PASSWORD,
     secure: true,
