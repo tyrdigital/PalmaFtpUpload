@@ -50,7 +50,6 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para rec
     console.log('Arquivo recebido:', req.file);
     const client = new ftp.Client(); //Cria o cliente FTP
     client.ftp.verbose = true;
-    client.ftp.setPassive(true); // Forçar o modo passivo
     try {
         console.log('Tentando conectar ao FTP...');
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
