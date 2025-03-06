@@ -14,9 +14,9 @@ const ftpConfig = {
     port: 21,
     user: 'palmasistemas',
     password: 'gremio1983',
-    secure: false,
+    secure: true,
     secureOptions: {
-        rejectUnauthorized: false
+        rejectUnauthorized: true
     }
 };
 
@@ -43,7 +43,7 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para rec
     }
     const client = new ftp.Client(); //Cria o cliente FTP
     client.ftp.verbose = true;
-    client.ftp.usePassiveMode = false;
+    client.ftp.usePassiveMode = true;
     try {
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
         const remotePath = '/www/Palma/'; // Caminho da pasta de destino no servidor FTP
