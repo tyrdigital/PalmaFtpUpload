@@ -49,6 +49,7 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para rec
     try {
         const client = new ftp.Client(); //Cria o cliente FTP
         client.ftp.verbose = true;
+        client.ftp.usePassiveMode = true; // Forçar modo passivo
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
         const remotePath = '/www/Palma/'; // Caminho da pasta de destino no servidor FTP
         await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
