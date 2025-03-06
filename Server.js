@@ -37,6 +37,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+app.get('/Hello', async(req, res) => { //Verificar LOGIN
+    res.status(200).json({message: "Hello!"});    
+});
+
 app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para receber arquivo
     if (!req.file) {
         return res.status(400).json({ error: "Nenhum Arquivo Enviado!" });
