@@ -72,7 +72,7 @@ export default function App() {
         type: file.mimeType || 'application/octet-stream'
       });
       //Envia para o servidor
-      const response = await axios.post(`http://${SERVER_CONFIG.ip}:${SERVER_CONFIG.port}/UPLOAD`,
+      const response = await axios.post(`https://palmaftpupload.onrender.com/UPLOAD`,
         formData,
         {
           headers: {
