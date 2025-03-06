@@ -54,7 +54,7 @@ app.post('/UPLOAD', upload.single('file'), async (req, res) => { //Rota para rec
         console.log('Tentando conectar ao FTP...');
         await client.access(ftpConfig); // Conecta-se ao servidor FTP
         console.log("Conexão com FTP bem-sucedida!");
-        const remotePath = '/Palma/'; // Caminho da pasta de destino no servidor FTP
+        const remotePath = '/www/Palma/'; // Caminho da pasta de destino no servidor FTP
         console.log('Fazendo upload do arquivo...');
         await client.uploadFrom(req.file.path, remotePath + req.file.filename); // Faz o upload do arquivo para o servidor FTP
         console.log(`Arquivo ${req.file.filename} enviado para o FTP`);
