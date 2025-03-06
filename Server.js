@@ -11,9 +11,9 @@ const port = 3000;
 
 //Informações do servidor FTP
 const ftpConfig = {
-    host: process.env.FTP_HOST,
-    user: process.env.FTP_USER,
-    password: process.env.FTP_PASSWORD,
+    host: 'www.palmasistemas.com.br',
+    user: 'palmasistemas',
+    password: 'gremio1983',
     secure: true,
     secureOptions: {
         rejectUnauthorized: false

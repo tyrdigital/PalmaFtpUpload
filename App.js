@@ -4,8 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
 
-//const SERVER_CONFIG = 'https://palmaftpupload.onrender.com';
-const SERVER_CONFIG = 'http://192.168.0.100:3000';
+const SERVER_CONFIG = { ip: '10.195.96.38', port: 3000 }; //Dados do servidor(IP: 10.195.96.38)
 
 export default function App() {
   const [loading, setLoading] = useState(false);
@@ -70,20 +69,22 @@ export default function App() {
       formData.append('file', {
         uri: file.uri,
         name: text.content + file.name.split('/').pop(),
-        type: 'application/octet-stream'
+        type: file.mimeType || 'application/octet-stream'
       });
       //Envia para o servidor
-      const response = await axios.post(`${SERVER_CONFIG}/UPLOAD`,
+      const response = await axios.post(`http://${SERVER_CONFIG.ip}:${SERVER_CONFIG.port}/UPLOAD`,
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'Accept' : 'application/json'
           },
         }
       );
       console.log('Arquivo enviado com sucesso:', response.data);
     }
     catch (error) {
+      console.error("Erro no Upload:", error);
       Alert.alert("Erro!", error.message);
     }
   }
